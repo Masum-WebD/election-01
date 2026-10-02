@@ -61,13 +61,13 @@ export default function Manifesto({ candidateConfig }) {
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold mb-3 border border-emerald-300">
             <FileCheck2 className="w-4 h-4 text-emerald-700" />
-            <span>আগামীর চরশাহী বিনির্মাণে</span>
+            <span>আগামীর {candidateConfig.unionName || 'ইউনিয়ন'} বিনির্মাণে</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#064e3b] font-display">
             জনতার নির্বাচনী ইশতেহার ({candidateConfig.electionYear})
           </h2>
           <p className="mt-3 text-stone-600 text-base sm:text-lg leading-relaxed">
-            কোনো ফাঁকা বুলি নয়, চেয়ারম্যান নির্বাচিত হলে আগামী ৫ বছরে বাস্তবভিত্তিক অগ্রাধিকার কর্মপরিকল্পনা।
+            কোনো ফাঁকা বুলি নয়, {candidateConfig.candidateRole || 'চেয়ারম্যান'} নির্বাচিত হলে আগামী ৫ বছরে বাস্তবভিত্তিক অগ্রাধিকার কর্মপরিকল্পনা।
           </p>
           <div className="mt-4 mx-auto w-24 h-1.5 bg-gradient-to-r from-emerald-600 via-amber-500 to-red-600 rounded-full"></div>
         </div>

@@ -13,13 +13,13 @@ export default function CandidateBio({ candidateConfig }) {
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold mb-3 border border-emerald-300">
             <UserCheck className="w-4 h-4 text-emerald-700" />
-            <span>চরশাহীর কৃতি সন্তান</span>
+            <span>{candidateConfig.unionName || 'ইউনিয়ন'}-এর কৃতি সন্তান</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#064e3b] font-display">
             পরিচিতি ও অতীত উন্নয়ন কর্মকাণ্ড
           </h2>
           <p className="mt-3 text-stone-600 text-base sm:text-lg leading-relaxed">
-            কথায় নয়, সততা ও কাজের মাধ্যমে যিনি দীর্ঘ দেড় যুগ ধরে চরশাহী ইউনিয়নবাসীর সেবায় নিবেদিত প্রাণ।
+            কথায় নয়, সততা ও কাজের মাধ্যমে যিনি সবসময় {candidateConfig.unionName || 'ইউনিয়ন'}-বাসীর সেবায় নিবেদিত প্রাণ।
           </p>
           <div className="mt-4 mx-auto w-24 h-1.5 bg-gradient-to-r from-emerald-600 via-amber-500 to-red-600 rounded-full"></div>
         </div>
@@ -55,54 +55,62 @@ export default function CandidateBio({ candidateConfig }) {
               </div>
 
               {/* Bio Summary Quote */}
-              <div className="p-4 rounded-2xl bg-emerald-50 border-l-4 border-emerald-600 text-stone-700 text-sm leading-relaxed mb-6 italic">
-                "{candidateConfig.bio.summary}"
-              </div>
+              {candidateConfig.bio?.summary && (
+                <div className="p-4 rounded-2xl bg-emerald-50 border-l-4 border-emerald-600 text-stone-700 text-sm leading-relaxed mb-6 italic">
+                  "{candidateConfig.bio.summary}"
+                </div>
+              )}
 
               {/* Family Standing & Heritage */}
               <div className="space-y-4 pt-2 border-t border-stone-100">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0 mt-0.5">
-                    <History className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-stone-900">পারিবারিক ঐতিহ্য</h4>
-                    <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">
-                      {candidateConfig.bio.familyHeritage}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Educational Qualifications */}
-                <div className="flex items-start gap-3 pt-2">
-                  <div className="p-2 rounded-xl bg-blue-100 text-blue-800 shrink-0 mt-0.5">
-                    <GraduationCap className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-stone-900 mb-2">শিক্ষাগত যোগ্যতা</h4>
-                    <div className="space-y-2">
-                      {candidateConfig.bio.education.map((edu, idx) => (
-                        <div key={idx} className="p-2 rounded-lg bg-stone-50 border border-stone-200/80 text-xs">
-                          <span className="font-bold text-stone-800">{edu.degree}</span>
-                          <span className="text-stone-500 block">{edu.institute} ({edu.year})</span>
-                        </div>
-                      ))}
+                {candidateConfig.bio?.familyHeritage && (
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0 mt-0.5">
+                      <History className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-stone-900">পারিবারিক ঐতিহ্য</h4>
+                      <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">
+                        {candidateConfig.bio.familyHeritage}
+                      </p>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Educational Qualifications */}
+                {Array.isArray(candidateConfig.bio?.education) && candidateConfig.bio.education.length > 0 && (
+                  <div className="flex items-start gap-3 pt-2">
+                    <div className="p-2 rounded-xl bg-blue-100 text-blue-800 shrink-0 mt-0.5">
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-bold text-stone-900 mb-2">শিক্ষাগত যোগ্যতা</h4>
+                      <div className="space-y-2">
+                        {candidateConfig.bio.education.map((edu, idx) => (
+                          <div key={idx} className="p-2 rounded-lg bg-stone-50 border border-stone-200/80 text-xs">
+                            <span className="font-bold text-stone-800">{edu.degree}</span>
+                            <span className="text-stone-500 block">{edu.institute} ({edu.year})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Ethical Principle */}
-                <div className="flex items-start gap-3 pt-2">
-                  <div className="p-2 rounded-xl bg-red-100 text-red-800 shrink-0 mt-0.5">
-                    <ShieldCheck className="w-5 h-5" />
+                {candidateConfig.bio?.socialPhilosophy && (
+                  <div className="flex items-start gap-3 pt-2">
+                    <div className="p-2 rounded-xl bg-red-100 text-red-800 shrink-0 mt-0.5">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-stone-900">সামাজিক অঙ্গীকার</h4>
+                      <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">
+                        {candidateConfig.bio.socialPhilosophy}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-stone-900">সামাজিক অঙ্গীকার</h4>
-                    <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed">
-                      {candidateConfig.bio.socialPhilosophy}
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
             </div>
@@ -161,7 +169,7 @@ export default function CandidateBio({ candidateConfig }) {
               <div className="mt-8 p-5 rounded-2xl bg-gradient-to-r from-[#064e3b] to-[#0b5d3b] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
                 <div className="text-left">
                   <h4 className="text-base font-bold text-amber-300">
-                    "চরশাহীর উন্নয়ন ও শান্তি রক্ষায় আমি আপসহীন"
+                    "{candidateConfig.unionName || 'ইউনিয়ন'}-এর উন্নয়ন ও শান্তি রক্ষায় আমি আপসহীন"
                   </h4>
                   <p className="text-xs text-emerald-100 mt-0.5">
                     আপনার একটি মূল্যবান ভোট দিতে পারে একটি আলোকিত আগামীর নিশ্চয়তা।

@@ -37,7 +37,7 @@ export default function MediaGallery({ candidateConfig }) {
             প্রচার অ্যালবাম ও গুরুত্বপূর্ণ ভাষণ
           </h2>
           <p className="mt-3 text-stone-600 text-base sm:text-lg leading-relaxed">
-            চরশাহীর সাধারণ মানুষের সাথে প্রার্থীর প্রত্যক্ষ যোগাযোগ, গণসংযোগ ও উঠান বৈঠকের খণ্ডচিত্র।
+            {candidateConfig.unionName || 'ইউনিয়ন'}-এর সাধারণ মানুষের সাথে প্রার্থীর প্রত্যক্ষ যোগাযোগ, গণসংযোগ ও উঠান বৈঠকের খণ্ডচিত্র।
           </p>
           <div className="mt-4 mx-auto w-24 h-1.5 bg-gradient-to-r from-emerald-600 via-amber-500 to-red-600 rounded-full"></div>
         </div>

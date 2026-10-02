@@ -27,7 +27,8 @@ export default function Hero({ candidateConfig }) {
   }, [candidateConfig.support_pledge_count]);
 
   useEffect(() => {
-    if (!candidateConfig.electionDate) return;
+    const isCountdownActive = candidateConfig.show_countdown !== false && candidateConfig.sections?.countdown !== false;
+    if (!isCountdownActive || !candidateConfig.electionDate) return;
     const targetDate = new Date(candidateConfig.electionDate).getTime();
 
     const updateCountdown = () => {
@@ -49,7 +50,7 @@ export default function Hero({ candidateConfig }) {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, [candidateConfig.electionDate]);
+  }, [candidateConfig.electionDate, candidateConfig.show_countdown, candidateConfig.sections?.countdown]);
 
   // Support / Pledge button handler
   const handleSupport = async () => {
@@ -286,56 +287,58 @@ export default function Hero({ candidateConfig }) {
             </div>
 
             {/* Live Election Countdown Box */}
-            <div className="w-full max-w-md mt-6 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-xl text-center">
-              <div className="flex items-center justify-center gap-1.5 text-xs text-amber-300 font-bold uppercase tracking-wider mb-3">
-                <Clock className="w-3.5 h-3.5" />
-                <span>ভোট গ্রহণের বাকি সময় (কাউন্টডাউন)</span>
-              </div>
+            {candidateConfig.show_countdown !== false && candidateConfig.sections?.countdown !== false && (
+              <div className="w-full max-w-md mt-6 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-xl text-center animate-fade-in">
+                <div className="flex items-center justify-center gap-1.5 text-xs text-amber-300 font-bold uppercase tracking-wider mb-3">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>ভোট গ্রহণের বাকি সময় (কাউন্টডাউন)</span>
+                </div>
 
-              <div className="grid grid-cols-4 gap-2 text-stone-900">
-                <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
-                  <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
-                    {toBengaliNumber(timeLeft.days)}
+                <div className="grid grid-cols-4 gap-2 text-stone-900">
+                  <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
+                      {toBengaliNumber(timeLeft.days)}
+                    </div>
+                    <div className="text-[11px] font-semibold text-stone-600 mt-0.5">দিন</div>
                   </div>
-                  <div className="text-[11px] font-semibold text-stone-600 mt-0.5">দিন</div>
-                </div>
-                <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
-                  <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
-                    {toBengaliNumber(timeLeft.hours)}
+                  <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
+                      {toBengaliNumber(timeLeft.hours)}
+                    </div>
+                    <div className="text-[11px] font-semibold text-stone-600 mt-0.5">ঘণ্টা</div>
                   </div>
-                  <div className="text-[11px] font-semibold text-stone-600 mt-0.5">ঘণ্টা</div>
-                </div>
-                <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
-                  <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
-                    {toBengaliNumber(timeLeft.minutes)}
+                  <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] font-outfit">
+                      {toBengaliNumber(timeLeft.minutes)}
+                    </div>
+                    <div className="text-[11px] font-semibold text-stone-600 mt-0.5">মিনিট</div>
                   </div>
-                  <div className="text-[11px] font-semibold text-stone-600 mt-0.5">মিনিট</div>
-                </div>
-                <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
-                  <div className="text-2xl sm:text-3xl font-extrabold text-red-600 font-outfit animate-pulse">
-                    {toBengaliNumber(timeLeft.seconds)}
+                  <div className="bg-white/95 rounded-xl p-2.5 shadow-inner">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-red-600 font-outfit animate-pulse">
+                      {toBengaliNumber(timeLeft.seconds)}
+                    </div>
+                    <div className="text-[11px] font-semibold text-stone-600 mt-0.5">সেকেন্ড</div>
                   </div>
-                  <div className="text-[11px] font-semibold text-stone-600 mt-0.5">সেকেন্ড</div>
                 </div>
-              </div>
 
-              <p className="text-[11px] text-emerald-200/80 mt-2.5">
-                {candidateConfig.electionDate 
-                  ? (() => {
-                      try {
-                        const d = new Date(candidateConfig.electionDate);
-                        const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
-                        const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-                        const toBn = (n) => n.toString().replace(/\d/g, (x) => bnNums[x]);
-                        return `ভোটের দিন: ${toBn(d.getDate())} ${months[d.getMonth()]} ${toBn(d.getFullYear())} • সকাল ৮:০০ হতে বিকাল ৪:০০`;
-                      } catch {
-                        return 'তারিখ: ২৫ নভেম্বর ২০২৬ • সকাল ৮:০০ টা হতে বিকাল ৪:০০ টা পর্যন্ত';
-                      }
-                    })()
-                  : 'তারিখ: ২৫ নভেম্বর ২০২৬ • সকাল ৮:০০ টা হতে বিকাল ৪:০০ টা পর্যন্ত'
-                }
-              </p>
-            </div>
+                <p className="text-[11px] text-emerald-200/80 mt-2.5">
+                  {candidateConfig.electionDate 
+                    ? (() => {
+                        try {
+                          const d = new Date(candidateConfig.electionDate);
+                          const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+                          const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+                          const toBn = (n) => n.toString().replace(/\d/g, (x) => bnNums[x]);
+                          return `ভোটের দিন: ${toBn(d.getDate())} ${months[d.getMonth()]} ${toBn(d.getFullYear())} • সকাল ৮:০০ হতে বিকাল ৪:০০`;
+                        } catch {
+                          return 'তারিখ: ২৫ নভেম্বর ২০২৬ • সকাল ৮:০০ টা হতে বিকাল ৪:০০ টা পর্যন্ত';
+                        }
+                      })()
+                    : 'তারিখ: ২৫ নভেম্বর ২০২৬ • সকাল ৮:০০ টা হতে বিকাল ৪:০০ টা পর্যন্ত'
+                  }
+                </p>
+              </div>
+            )}
 
           </div>
 

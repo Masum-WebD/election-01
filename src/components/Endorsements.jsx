@@ -97,13 +97,13 @@ export default function Endorsements({ candidateConfig }) {
         <div className="mt-14 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#064e3b] to-[#0b5d3b] text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="text-left space-y-1">
             <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-              আপনিও কি রফিকুল ইসলাম চৌধুরী ভাইয়ের সমর্থক?
+              আপনিও কি {candidateConfig.candidate_short_name || candidateConfig.name} ভাইয়ের সমর্থক?
             </span>
             <h3 className="text-xl sm:text-2xl font-black font-display">
               আপনার সমর্থন বার্তা ও শুভেচ্ছা বক্তব্য যুক্ত করুন
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100 max-w-xl">
-              চরশাহীর উন্নয়নে আপনার মতামত ও শুভকামনা অন্যান্য ভোটারদের অনুপ্রাণিত করবে।
+              {candidateConfig.unionName || 'ইউনিয়নের'} উন্নয়নে আপনার মতামত ও শুভকামনা অন্যান্য ভোটারদের অনুপ্রাণিত করবে।
             </p>
           </div>
 
@@ -178,7 +178,7 @@ export default function Endorsements({ candidateConfig }) {
                     required
                     value={newEndorsement.quote}
                     onChange={(e) => setNewEndorsement({ ...newEndorsement, quote: e.target.value })}
-                    placeholder="কেন আপনি আলহাজ্ব রফিকুল ইসলাম চৌধুরী ভাইকে যোগ্য মনে করেন..."
+                    placeholder={`কেন আপনি ${candidateConfig.candidate_short_name || candidateConfig.name} ভাইকে যোগ্য মনে করেন...`}
                     className="w-full p-3 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
                   />
                 </div>

@@ -442,7 +442,7 @@ export default function GrievanceBox({ candidateConfig, initialGrievances = [] }
             </h3>
 
             <p className="text-sm text-stone-600 mt-2">
-              আপনার দাখিলকৃত দাবিটি প্রার্থী আলহাজ্ব মো: রফিকুল ইসলাম চৌধুরীর নির্বাচনী ডাটাবেজে সফলভাবে সংরক্ষিত হয়েছে।
+              আপনার দাখিলকৃত দাবিটি প্রার্থী {candidateConfig.name}-এর নির্বাচনী ডাটাবেজে সফলভাবে সংরক্ষিত হয়েছে।
             </p>
 
             {/* Tracking Receipt Box */}

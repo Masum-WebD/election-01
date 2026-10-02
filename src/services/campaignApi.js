@@ -1,5 +1,3 @@
-import { candidateConfig as fallbackConfig } from '../data/candidateConfig';
-
 export const getBackendBaseUrl = () => {
   if (import.meta.env.VITE_BACKEND_URL) {
     return import.meta.env.VITE_BACKEND_URL.replace(/\/+$/, '');
@@ -7,7 +5,7 @@ export const getBackendBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '');
   }
-  return 'http://127.0.0.1:8000';
+  return 'https://ashaful.oblate-it.com';
 };
 
 export const getApiBaseUrl = () => {
@@ -15,10 +13,7 @@ export const getApiBaseUrl = () => {
     const raw = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
     return raw.endsWith('/api') ? raw : `${raw}/api`;
   }
-  if (typeof window !== 'undefined' && window.location.port === '5173') {
-    return '/api';
-  }
-  return 'http://127.0.0.1:8000/api';
+  return 'https://ashaful.oblate-it.com/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -37,68 +32,25 @@ export async function fetchCampaignData() {
     }
 
     const data = await res.json();
-    if (data.success) {
+    if (data.success && data.settings) {
       return {
         isLiveApi: true,
         settings: data.settings,
         sections: data.sections || {},
-        manifestos: data.manifestos && data.manifestos.length > 0 ? data.manifestos : fallbackConfig.manifesto,
-        grievances: data.grievances && data.grievances.length > 0 ? data.grievances : [],
-        gallery: data.gallery && data.gallery.length > 0 ? data.gallery : fallbackConfig.gallery,
-        videos: data.videos && data.videos.length > 0 ? data.videos : fallbackConfig.videos,
-        endorsements: data.endorsements && data.endorsements.length > 0 ? data.endorsements : fallbackConfig.testimonials,
-        wards: data.wards || fallbackConfig.wards,
+        manifestos: data.manifestos || [],
+        grievances: data.grievances || [],
+        gallery: data.gallery || [],
+        videos: data.videos || [],
+        endorsements: data.endorsements || [],
+        wards: data.wards || [],
       };
     }
   } catch (error) {
-    console.warn('Backend API connection warning (using local fallback):', error.message);
+    console.warn('Backend API connection warning:', error.message);
   }
 
-  // Graceful fallback to local mock config
-  return {
-    isLiveApi: false,
-    settings: {
-      candidate_name: fallbackConfig.name,
-      candidate_short_name: 'রফিকুল ইসলাম চৌধুরী',
-      candidate_role: fallbackConfig.candidateRole,
-      union_name: fallbackConfig.unionName,
-      upazila: fallbackConfig.upazila,
-      district: fallbackConfig.district,
-      election_year: fallbackConfig.electionYear,
-      election_date: fallbackConfig.electionDate,
-      symbol_name: fallbackConfig.symbol.name,
-      symbol_tagline: fallbackConfig.symbol.tagline,
-      show_symbol: true,
-      slogan: fallbackConfig.slogan,
-      sub_slogan: fallbackConfig.subSlogan,
-      phone_primary: fallbackConfig.contacts.phonePrimary,
-      phone_secondary: fallbackConfig.contacts.phoneSecondary,
-      whatsapp: fallbackConfig.contacts.whatsapp,
-      email: fallbackConfig.contacts.email,
-      office_address: fallbackConfig.contacts.officeAddress,
-      meeting_time: fallbackConfig.contacts.meetingTime,
-      support_pledge_count: 12485,
-      stats: fallbackConfig.stats,
-      bio_data: fallbackConfig.bio,
-    },
-    sections: {
-      symbol: true,
-      hero: true,
-      notice_bar: true,
-      bio: true,
-      manifesto: true,
-      poster_generator: true,
-      grievance: true,
-      gallery: true,
-      testimonials: true,
-    },
-    manifestos: fallbackConfig.manifesto,
-    grievances: [],
-    gallery: fallbackConfig.gallery,
-    videos: fallbackConfig.videos,
-    endorsements: fallbackConfig.testimonials,
-    wards: fallbackConfig.wards,
-  };
+  // Data not found / API failure - return null (no static fallback)
+  return null;
 }
 
 /**
@@ -122,7 +74,7 @@ export async function submitGrievanceApi(formData) {
     console.error('API submission error:', error);
     // If backend direct fallback needed
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/grievances', {
+      const res = await fetch('https://ashaful.oblate-it.com/api/grievances', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +115,7 @@ export async function submitPledgeApi() {
   } catch (error) {
     console.warn('Pledge API error:', error);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/pledge', {
+      const res = await fetch('https://ashaful.oblate-it.com/api/pledge', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
       });
@@ -192,7 +144,7 @@ export async function submitEndorsementApi(data) {
   } catch (error) {
     console.error('Endorsement API error:', error);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/endorsements', {
+      const res = await fetch('https://ashaful.oblate-it.com/api/endorsements', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

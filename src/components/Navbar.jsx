@@ -15,10 +15,10 @@ export default function Navbar({ candidateConfig, sections = {}, onOpenPosterTab
   }, []);
 
   // Symbol / Marka visibility switch (controlled from admin)
-  const isSymbolVisible = sections.symbol !== false && candidateConfig.show_symbol !== false;
+  const isSymbolVisible = sections.symbol !== false && candidateConfig.show_symbol !== false && candidateConfig.show_symbol !== 0 && candidateConfig.show_symbol !== '0';
 
   // Candidate short name instead of full name
-  const candidateShortName = candidateConfig.candidate_short_name || candidateConfig.shortName || 'রফিকুল ইসলাম চৌধুরী';
+  const candidateShortName = candidateConfig.candidate_short_name || candidateConfig.shortName || candidateConfig.name;
 
   // Streamlined primary nav options (reduced options for clean layout)
   const navCandidateLinks = [

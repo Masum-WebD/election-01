@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { candidateConfig as fallbackConfig } from './data/candidateConfig';
 import { fetchCampaignData, getBackendBaseUrl } from './services/campaignApi';
 import Navbar from './components/Navbar';
 import ElectionNoticeBar from './components/ElectionNoticeBar';
@@ -32,14 +31,17 @@ export default function App() {
   const loadData = async () => {
     try {
       const data = await fetchCampaignData();
-      if (data) {
+      if (data && data.settings) {
         setCampaignData(data);
         if (data.sections && Object.keys(data.sections).length > 0) {
           setSections(data.sections);
         }
+      } else {
+        setCampaignData(null);
       }
     } catch (err) {
       console.warn('Data sync warning:', err);
+      setCampaignData(null);
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +55,16 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Dynamically set Browser Tab Title according to Candidate Name & Union
+  useEffect(() => {
+    if (campaignData?.settings?.candidate_name) {
+      const name = campaignData.settings.candidate_name;
+      const role = campaignData.settings.candidate_role || 'চেয়ারম্যান পদপ্রার্থী';
+      const union = campaignData.settings.union_name || '';
+      document.title = union ? `${name} | ${role} | ${union}` : `${name} | ${role}`;
+    }
+  }, [campaignData]);
+
   const handleScrollToPoster = () => {
     const el = document.getElementById('poster-generator');
     if (el) {
@@ -60,8 +72,56 @@ export default function App() {
     }
   };
 
+  // 1. Loading State - Sleek, branded loading spinner (Never flashes old static data)
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#064e3b] text-white font-bengali">
+        <div className="relative flex items-center justify-center mb-5">
+          <div className="w-16 h-16 border-4 border-emerald-400/30 border-t-amber-400 rounded-full animate-spin"></div>
+          <span className="absolute text-xl font-black text-amber-300">ভোট</span>
+        </div>
+        <h2 className="text-xl font-bold tracking-wide text-emerald-100">নির্বাচনী পোর্টাল লোড হচ্ছে...</h2>
+        <p className="text-xs text-emerald-300/80 mt-1 font-light">অনুগ্রহ করে অপেক্ষা করুন</p>
+      </div>
+    );
+  }
+
+  // 2. Data Not Found State - If database has no data or server is down
+  if (!campaignData || !campaignData.settings) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-stone-100 text-stone-700 px-4 text-center font-bengali">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-stone-200">
+          <div className="w-16 h-16 mx-auto mb-4 bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center font-bold text-2xl">
+            ভোট
+          </div>
+          <h2 className="text-2xl font-black text-stone-800 font-display">কোনো তথ্য পাওয়া যায়নি</h2>
+          <p className="text-sm text-stone-500 mt-2 leading-relaxed">
+            সার্ভার থেকে নির্বাচনী তথ্য পাওয়া যায়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ চেক করে পুনরায় রিলোড দিন।
+          </p>
+          <button
+            onClick={() => { setIsLoading(true); loadData(); }}
+            className="mt-6 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl shadow transition-all cursor-pointer"
+          >
+            পুনরায় চেষ্টা করুন
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Determine whether election symbol (মার্কা) is enabled or disabled
-  const isSymbolVisible = sections.symbol !== false && campaignData?.settings?.show_symbol !== false;
+  const isSettingSymbolOn = campaignData?.settings?.show_symbol !== undefined 
+    ? (campaignData.settings.show_symbol !== false && campaignData.settings.show_symbol !== 0 && campaignData.settings.show_symbol !== '0')
+    : true;
+  const isSectionSymbolOn = sections.symbol !== false && sections.symbol !== 0 && sections.symbol !== '0';
+  const isSymbolVisible = isSectionSymbolOn && isSettingSymbolOn;
+
+  // Determine whether election countdown (কাউন্টডাউন) is enabled or disabled
+  const isSettingCountdownOn = campaignData?.settings?.show_countdown !== undefined
+    ? (campaignData.settings.show_countdown !== false && campaignData.settings.show_countdown !== 0 && campaignData.settings.show_countdown !== '0')
+    : true;
+  const isSectionCountdownOn = sections.countdown !== false && sections.countdown !== 0 && sections.countdown !== '0';
+  const isCountdownVisible = isSectionCountdownOn && isSettingCountdownOn;
 
   const resolveAssetUrl = (path, fallback = null) => {
     if (!path) return fallback;
@@ -75,56 +135,53 @@ export default function App() {
     return path;
   };
 
-  // Merge live API settings with fallback config for maximum stability
+  // Purely dynamic campaign configuration from backend database
+  const settings = campaignData.settings;
   const mergedConfig = {
-    ...fallbackConfig,
     sections,
-    ...(campaignData?.settings ? {
-      name: campaignData.settings.candidate_name || fallbackConfig.name,
-      candidate_short_name: campaignData.settings.candidate_short_name || 'রফিকুল ইসলাম চৌধুরী',
-      candidateRole: campaignData.settings.candidate_role || fallbackConfig.candidateRole,
-      unionName: campaignData.settings.union_name || fallbackConfig.unionName,
-      upazila: campaignData.settings.upazila || fallbackConfig.upazila,
-      district: campaignData.settings.district || fallbackConfig.district,
-      electionYear: campaignData.settings.election_year || fallbackConfig.electionYear,
-      electionDate: campaignData.settings.election_date || fallbackConfig.electionDate,
-      slogan: campaignData.settings.slogan || fallbackConfig.slogan,
-      subSlogan: campaignData.settings.sub_slogan || fallbackConfig.subSlogan,
-      show_symbol: isSymbolVisible,
-      symbol: {
-        ...fallbackConfig.symbol,
-        name: campaignData.settings.symbol_name || fallbackConfig.symbol.name,
-        image: resolveAssetUrl(campaignData.settings.symbol_image_path, null),
-      },
-      contacts: {
-        ...fallbackConfig.contacts,
-        phonePrimary: campaignData.settings.phone_primary || fallbackConfig.contacts.phonePrimary,
-        phoneSecondary: campaignData.settings.phone_secondary || fallbackConfig.contacts.phoneSecondary,
-        whatsapp: campaignData.settings.whatsapp || fallbackConfig.contacts.whatsapp,
-        email: campaignData.settings.email || fallbackConfig.contacts.email,
-        officeAddress: campaignData.settings.office_address || fallbackConfig.contacts.officeAddress,
-      }
-    } : {
-      candidate_short_name: 'রফিকুল ইসলাম চৌধুরী',
-      show_symbol: isSymbolVisible,
-      symbol: {
-        ...fallbackConfig.symbol,
-        image: null,
-      }
-    }),
-    assets: {
-      ...fallbackConfig.assets,
-      portrait: resolveAssetUrl(campaignData?.settings?.portrait_path, fallbackConfig.assets.portrait),
+    name: settings.candidate_name || '',
+    candidate_short_name: settings.candidate_short_name || settings.candidate_name || '',
+    candidateRole: settings.candidate_role || 'চেয়ারম্যান পদপ্রার্থী',
+    unionName: settings.union_name || '',
+    upazila: settings.upazila || '',
+    district: settings.district || '',
+    electionYear: settings.election_year || '২০২৬',
+    electionDate: settings.election_date || '',
+    slogan: settings.slogan || '',
+    subSlogan: settings.sub_slogan || '',
+    show_symbol: isSymbolVisible,
+    show_countdown: isCountdownVisible,
+    symbol: {
+      name: settings.symbol_name || 'মার্কা',
+      tagline: settings.symbol_tagline || '',
+      image: resolveAssetUrl(settings.symbol_image_path, null),
     },
-    support_pledge_count: campaignData?.settings?.support_pledge_count || fallbackConfig.support_pledge_count || 12485,
-    stats: (campaignData?.settings?.stats && Array.isArray(campaignData.settings.stats) && campaignData.settings.stats.length > 0)
-      ? campaignData.settings.stats
-      : fallbackConfig.stats,
-    bio: campaignData?.settings?.bio_data || fallbackConfig.bio,
-    manifesto: campaignData?.manifestos?.length > 0 ? campaignData.manifestos : fallbackConfig.manifesto,
-    gallery: campaignData?.gallery?.length > 0 ? campaignData.gallery : fallbackConfig.gallery,
-    videos: campaignData?.videos?.length > 0 ? campaignData.videos : fallbackConfig.videos,
-    testimonials: campaignData?.endorsements?.length > 0 ? campaignData.endorsements : fallbackConfig.testimonials,
+    contacts: {
+      phonePrimary: settings.phone_primary || '',
+      phoneSecondary: settings.phone_secondary || '',
+      whatsapp: settings.whatsapp || '',
+      email: settings.email || '',
+      officeAddress: settings.office_address || '',
+      meetingTime: settings.meeting_time || '',
+    },
+    socialLinks: {
+      facebook: settings.facebook || 'https://facebook.com',
+      youtube: settings.youtube || 'https://youtube.com',
+      whatsapp: settings.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/[^0-9]/g, '')}` : '',
+    },
+    assets: {
+      portrait: resolveAssetUrl(settings.portrait_path, '/assets/candidate_portrait.jpg'),
+      rallyPhoto: '/assets/campaign_rally.jpg',
+      massContactPhoto: '/assets/mass_contact.jpg',
+    },
+    support_pledge_count: Number(settings.support_pledge_count) || 0,
+    stats: Array.isArray(settings.stats) ? settings.stats : [],
+    bio: settings.bio_data || {},
+    manifesto: campaignData.manifestos || [],
+    gallery: campaignData.gallery || [],
+    videos: campaignData.videos || [],
+    testimonials: campaignData.endorsements || [],
+    wards: campaignData.wards || [],
   };
 
   return (
