@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary-green: #0b5d3b;
+    --primary-dark: #064e3b;
+    --accent-red: #dc2626;
+    --accent-gold: #d97706;
+    --bg-cream: #faf9f5;
+  }
+
+  body {
+    font-family: 'Hind Siliguri', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8faf8;
+    color: #1c2720;
+    overflow-x: hidden;
+  }
+}
+
+.font-bengali {
+  font-family: 'Hind Siliguri', sans-serif;
+}
+
+.font-display {
+  font-family: 'Tiro Bangla', 'Hind Siliguri', serif;
+}
+
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Election poster borders & Bangladeshi press style elements */
+.bd-poster-border {
+  border: 4px double #064e3b;
+  box-shadow: inset 0 0 0 2px #d97706;
+}
+
+.bd-poster-bw-border {
+  border: 4px double #111111;
+  box-shadow: inset 0 0 0 2px #333333;
+}
+
+.ballot-seal {
+  background: radial-gradient(circle, #dc2626 0%, #991b1b 100%);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+}
+
+/* Halftone dot pattern for authentic newsprint / press look */
+.bg-halftone {
+  background-image: radial-gradient(#000000 15%, transparent 16%);
+  background-size: 8px 8px;
+}
+
+/* Glassmorphism card header */
+.glass-header {
+  background: rgba(11, 93, 59, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #0b5d3b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #064e3b;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.85);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite;
+}
