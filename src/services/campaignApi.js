@@ -1,7 +1,20 @@
 import { candidateConfig as fallbackConfig } from '../data/candidateConfig';
 
-const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+export const getBackendBaseUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL.replace(/\/+$/, '');
+  }
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '');
+  }
+  return 'http://127.0.0.1:8000';
+};
+
+export const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    const raw = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  }
   if (typeof window !== 'undefined' && window.location.port === '5173') {
     return '/api';
   }
@@ -15,18 +28,9 @@ const API_BASE_URL = getApiBaseUrl();
  */
 export async function fetchCampaignData() {
   try {
-    // Attempt primary URL, and if failed try fallback direct port 8000
-    let res;
-    try {
-      res = await fetch(`${API_BASE_URL}/campaign-data`, {
-        headers: { 'Accept': 'application/json' }
-      });
-    } catch {
-      // Fallback directly to 8000 if proxy failed
-      res = await fetch('http://127.0.0.1:8000/api/campaign-data', {
-        headers: { 'Accept': 'application/json' }
-      });
-    }
+    const res = await fetch(`${API_BASE_URL}/campaign-data`, {
+      headers: { 'Accept': 'application/json' }
+    });
 
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { candidateConfig as fallbackConfig } from './data/candidateConfig';
-import { fetchCampaignData } from './services/campaignApi';
+import { fetchCampaignData, getBackendBaseUrl } from './services/campaignApi';
 import Navbar from './components/Navbar';
 import ElectionNoticeBar from './components/ElectionNoticeBar';
 import Hero from './components/Hero';
@@ -68,8 +68,9 @@ export default function App() {
     if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
       return path;
     }
-    if (path.startsWith('/uploads')) {
-      return `http://127.0.0.1:8000${path}`;
+    if (path.startsWith('/uploads') || path.startsWith('uploads/')) {
+      const cleanPath = path.startsWith('/') ? path : `/${path}`;
+      return `${getBackendBaseUrl()}${cleanPath}`;
     }
     return path;
   };
